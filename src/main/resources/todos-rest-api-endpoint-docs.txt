@@ -1,0 +1,350 @@
+baseURL = loacalhost:8080/api/v1/
+
+Request
+  * Media type: application/json
+  * Type: Object
+
+Response
+ * Content-Type: application/json
+ * Type: Object
+
+===============================================================
+				authorization / registration
+===============================================================
+
+POST baseURL + auth/signin - for authorization in API
+
+Request
+  - Properties (required):
+  	* email : string 
+  	* password: string 
+ 
+ Example:
+ 	{
+ 		"email" : "test@test.com",
+ 		"password" : "qwerty007"
+ 	}
+
+Response
+ - Properties (required):
+ 	* httpStatus : string (contains http request execution status)
+ 	* data : object (contains an object with information about the user and the authorization token)
+ 	* messages: string (is empty if resultCode 0, contains error messages if resultCode is different from 0)
+ 	* resultCode: number (0 if opearation completed successfully, other numbers - some error occured)
+
+ Example:
+ * if no errors:
+	 {
+	 	"httpStatus": "OK",
+	    "data": {
+	        "user": {
+	            "id": 3,
+	            "email": "test@test.com",
+	            "firstName": "Ivan",
+	            "lastName": "Ivanov",
+	            "roles": [
+	                {
+	                    "name": "ROLE_USER"
+	                }
+	            ]
+	        },
+	        "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzbTFsNDNzQG1haWwucnUiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNjE0ODQ4MjIzLCJleHAiOjE2MTQ4NTE4MjN9.CYiQzwogCa6TSVGksWPXb2wlijoRn1HCJbBc5qI25X8"
+	    },
+	    "messages": "",
+	    "resultCode": 0
+	 }
+
+* if have some errors:
+	{
+    "httpStatus": "NOT_FOUND",
+    "data": null,
+    "messages": "Invalid email or password",
+    "resultCode": 1
+}
+
+
+POST baseURL + auth/signup - for register on the service
+
+ Request:
+  - Properties (required):
+  	* email : string 
+  	* password: string
+  	* firtsname: string
+  	* lastname: string 
+  
+  Example:
+  	{
+	    "email" : "qwerty@mail.com",
+	    "password" : "qwerty",
+	    "firstname" : "Ivan",
+	    "lastname" : "Ivanov"
+	}
+
+Response:
+ - Properties (required):
+ 	* httpStatus : string (contains nttp request execution status)
+ 	* data : object (contains an object with information about the user and the authorization token)
+ 	* messages: string (reports a successful or unsuccessful operation)
+ 	* resultCode: number (0 if opearation completed successfully, other numbers - some error occured)
+
+ Example:
+	 {
+	    "httpStatus": "OK",
+	    "data": {
+	        "id": 4,
+	        "email": "qwerty@mail.com",
+	        "firstName": "Ivan",
+	        "lastName": "Ivanov",
+	        "roles": [
+	            {
+	                "name": "ROLE_USER"
+	            }
+	        ]
+	    },
+	    "messages": "New account created",
+	    "resultCode": 0
+	}
+
+GET baseURL + auth/me - Is current user authorized
+if the HTTP contains the "Authorization" header and it contains the token issued during authorization,
+ then it will return information about the authorized user
+
+Response:
+ - Properties (required):
+ 	* httpStatus : string (contains nttp request execution status)
+ 	* data : object (contains an object with information about the user and the authorization token)
+ 	* messages: string (reports a successful or unsuccessful operation)
+ 	* resultCode: number (0 if opearation completed successfully, other numbers - some error occured)
+
+ Exmaple:
+	 {
+	    "httpStatus": "OK",
+	    "data": {
+	        "id": 4,
+	        "email": "qwerty@mail.com",
+	        "firstName": "Ivan",
+	        "lastName": "Ivanov",
+	        "roles": [
+	            {
+	                "name": "ROLE_USER"
+	            }
+	        ]
+	    },
+	    "messages": "",
+	 }
+
+===============================================
+		end	authorization / registration
+===============================================
+
+===============================================
+			users action
+===============================================	   
+In headers HTTP must be header with name "Authorization" with value "Bearer ${token authorization}" 
+
+
+GET baseURL + users - Returns all users splitted by page
+
+	Query Parameters:
+		*count: (integer - default: 10 - maximum: 100)
+			page size (how many items will be returned in response)
+		
+		*page: (integer - default: 1)
+			number of portion of items
+
+	Response:
+		* Properties:
+			- httpStatus : string 
+				(contains http request execution status)
+ 			
+ 			- data : array object 
+ 				(contains an object with information about the user)
+ 			
+ 			- messages: string 
+ 				(is empty if resultCode 0, contains error messages if resultCode is different from 0)
+ 			
+ 			- resultCode: number 
+ 				(0 if opearation completed successfully, other numbers - some error occured)
+ 			
+ 			- totalElements: number 
+ 				(total amount of registered users matching criteria)
+
+GET baseURL + users/id - get info about user with path variable id
+
+	Path variable
+		* id : number
+
+	Response:
+		* Properties:
+			- httpStatus : string 
+				(contains http request execution status)
+ 			- data : object 
+ 				(contains an object with information about the user)
+ 			- messages: string 
+ 				(is empty if resultCode 0, contains error messages if resultCode is different from 0)
+ 			- resultCode: number 
+ 				(0 if opearation completed successfully, other numbers - some error occured)
+
+PUT baseURL + users - update information about current user
+
+	Request:
+  	 	- Properties (required):
+  			* email : string 
+  			* firtsname: string
+  			* lastname: string 
+
+  	Response:
+		* Properties:
+			- httpStatus : string 
+				(contains http request execution status)
+ 			- data : object 
+ 				(contains an object with information about the user with updated data)
+ 			- messages: string 
+ 				(is empty if resultCode 0, contains error messages if resultCode is different from 0)
+ 			- resultCode: number 
+ 				(0 if opearation completed successfully, other numbers - some error occured)
+
+DELETE basuURL + users - delete current user at service
+
+	Response:
+		* Properties:
+			- httpStatus : string 
+				(contains http request execution status)
+ 			- data : null
+ 			- messages: string 
+ 				(if resultCode 0, contains messages on success deleted)
+ 			- resultCode: number 
+ 				(0 if opearation completed successfully, other numbers - some error occured)
+
+====================================
+	users action with tasks
+====================================
+
+GET baseURL + users/tasks - get list tasks at current user
+	
+	Query Parameters:
+		*count: (integer - default: 10 - maximum: 100)
+			page size (how many items will be returned in response)
+		
+		*page: (integer - default: 1)
+			number of portion of items
+
+	Response:
+		* Properties:
+			- httpStatus : string 
+				(contains http request execution status)
+ 			
+ 			- data : array object 
+ 				(contains an object with information about the user)
+ 			
+ 			- messages: string 
+ 				(is empty if resultCode 0, contains error messages if resultCode is different from 0)
+ 			
+ 			- resultCode: number 
+ 				(0 if opearation completed successfully, other numbers - some error occured)
+ 		
+ 			- totalElements: number 
+ 				(total amount of registered users matching criteria)
+
+GET baseURL + users/tasks/idTask - get a task from the current user with id along with a path variable
+
+    Path variable
+        * idTask: number - id task
+
+    Response:
+        * Properties:
+    		- httpStatus : string
+    			(contains http request execution status)
+     		- data : object
+     			(contains an object with information about the task)
+     		- messages: string
+   				(is empty if resultCode 0, contains error messages if resultCode is different from 0)
+   			- resultCode: number
+   			    (0 if opearation completed successfully, other numbers - some error occured)
+
+GET baseURL + users/id/tasks - get list tasks user with path variable id
+
+	Path variable:
+		* id: number - user id whose task list we want to get
+
+	Query Parameters:
+		*count: (integer - default: 10 - maximum: 100)
+			page size (how many items will be returned in response)
+		
+		*page: (integer - default: 1)
+			number of portion of items
+
+	Response:
+		* Properties:
+			- httpStatus : string 
+				(contains http request execution status)
+ 			
+ 			- data : array object 
+ 				(contains an object with information about the user)
+ 			
+ 			- messages: string 
+ 				(is empty if resultCode 0, contains error messages if resultCode is different from 0)
+ 			
+ 			- resultCode: number 
+ 				(0 if opearation completed successfully, other numbers - some error occured)
+ 		
+ 			- totalElements: number 
+ 				(total amount of registered users matching criteria)
+
+POST baseURL + users/tasks - add task to current user
+
+	Request param
+		* title: string (title task)
+		* description: string (description task)
+		* startDate: string ("yyyy-mm-dd") (date start task)
+		* endDate: string ("yyyy-mm-dd") (date end task)
+
+	Response:
+		* Properties:
+			- httpStatus : string 
+				(contains http request execution status)
+ 			- data : object 
+ 				(contains an object with information about the task)
+ 			- messages: string 
+ 				(is empty if resultCode 0, contains error messages if resultCode is different from 0)
+ 			- resultCode: number 
+ 				(0 if opearation completed successfully, other numbers - some error occured)
+
+PUT baseURL + users/tasks/idTask - update data about task at current user
+
+	Request param
+		* title: string (title task)
+		* description: string (description task)
+		* startDate: string ("yyyy-mm-dd") (date start task)
+		* endDate: string ("yyyy-mm-dd") (date end task)
+		* status: string (have value "ACTIVE", "COMPLETED", "FAILED");
+
+	Response
+		* Properties:
+			- httpStatus : string 
+				(contains http request execution status)
+ 			- data : object 
+ 				(contains an object with information about the task after update)
+ 			- messages: string 
+ 				(is empty if resultCode 0, contains error messages if resultCode is different from 0)
+ 			- resultCode: number 
+ 				(0 if opearation completed successfully, other numbers - some error occured)
+
+DELETE baseURL + users/tasks/idTask - delete task with path variable idTask in current user
+
+	Path variable
+		* id: number
+
+	Response:
+		* Properties:
+			- httpStatus : string 
+				(contains http request execution status)
+ 			- data : null
+ 			- messages: string 
+ 				(message about successfully operation)
+ 			- resultCode: number 
+ 				(0 if opearation completed successfully, other numbers - some error occured)
+
+===============================================
+	end user action and user action with task
+===============================================
