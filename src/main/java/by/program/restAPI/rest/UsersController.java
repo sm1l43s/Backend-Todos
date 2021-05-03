@@ -1,7 +1,7 @@
 package by.program.restAPI.rest;
 
-import by.program.restAPI.dto.forUserDto.UserDto;
 import by.program.restAPI.dto.forUserDto.UpdateUserDto;
+import by.program.restAPI.dto.forUserDto.UserDto;
 import by.program.restAPI.model.Status;
 import by.program.restAPI.model.User;
 import by.program.restAPI.responseEntity.CommonResponse;
@@ -12,18 +12,14 @@ import by.program.restAPI.service.RoleService;
 import by.program.restAPI.service.UserService;
 import by.program.restAPI.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartResolver;
 
-import javax.servlet.MultipartConfigElement;
 import java.io.IOException;
 import java.util.List;
 

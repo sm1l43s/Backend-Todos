@@ -32,7 +32,7 @@ public class AdminUserDto {
         return adminUserDto;
     }
 
-    public static  List<AdminUserDto> fromListUserToListAdminUserDto(List<User> users) {
+    public static List<AdminUserDto> fromListUserToListAdminUserDto(List<User> users) {
         List<AdminUserDto> adminUserDtoList = new ArrayList<>();
 
         for (User user: users) {

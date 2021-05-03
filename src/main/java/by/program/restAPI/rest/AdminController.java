@@ -80,6 +80,7 @@ public class AdminController {
         return ResponseFromServer.returnResult(response, HttpStatus.OK);
     }
 
+    // ToDo: Refactor this method
     @RequestMapping(value = "users", method = RequestMethod.PUT)
     public ResponseEntity updateUsers(@RequestHeader("Authorization") String bearerToken,
                                       @RequestBody UpdateUserDto updateUserDto) {
