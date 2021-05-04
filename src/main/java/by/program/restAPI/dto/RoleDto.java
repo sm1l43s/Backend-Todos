@@ -5,9 +5,6 @@ import by.program.restAPI.service.RoleService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 public class RoleDto {
 

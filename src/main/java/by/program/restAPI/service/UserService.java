@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.sql.Date;
-import java.util.List;
 
 public interface UserService {
 
@@ -29,9 +28,9 @@ public interface UserService {
     User findByIdAndStatusNot(long id, Status status);
 
     Page<User> getAllByStatusNotAndFirstNameContainingOrLastNameContaining(Pageable pageable,
-                                                                            Status status,
-                                                                            String searchFirstName,
-                                                                            String searchLastName);
+                                                                           Status status,
+                                                                           String searchFirstName,
+                                                                           String searchLastName);
 
     void delete(Long id);
 }

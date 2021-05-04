@@ -42,7 +42,8 @@ public class TaskController {
         CommonResponse response = null;
         User user = utils.getUser(bearerToken);
         Page<Task> data = taskService.getAllTaskByUserAndStatusNot(user, PageRequest.of(page - 1, size),
-                Status.DELETED);;
+                Status.DELETED);
+        ;
 
         if (data.isEmpty() || size > 100) {
             response = new CommonResponse(HttpStatus.NOT_FOUND, null, "Not found tasks", 1);

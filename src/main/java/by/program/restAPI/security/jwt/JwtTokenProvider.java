@@ -35,7 +35,8 @@ public class JwtTokenProvider {
         return bCryptPasswordEncoder;
     }
 
-    public JwtTokenProvider() {}
+    public JwtTokenProvider() {
+    }
 
     @PostConstruct
     protected void init() {

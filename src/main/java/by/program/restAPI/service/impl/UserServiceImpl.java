@@ -93,8 +93,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> getAllByStatusNotAndFirstNameContainingOrLastNameContaining(Pageable pageable, Status status,
-                                                                                   String searchFirstName,
-                                                                                   String searchLastName) {
+                                                                                  String searchFirstName,
+                                                                                  String searchLastName) {
         Page<User> result = userRepository.findAllByStatusNotAndFirstNameContainingOrLastNameContaining(pageable, status,
                 searchFirstName, searchFirstName);
         log.info("IN getAllByStatusNotAndFirstNameContainingAndLastNameContaining - {} user found", result);

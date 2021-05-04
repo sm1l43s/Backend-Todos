@@ -80,9 +80,9 @@ public class AuthenticationController {
         }
 
         User user = new User(signUpDto.getEmail(), signUpDto.getFirstname(),
-                signUpDto.getLastname(), signUpDto.getPassword(),null,null, null, null);
+                signUpDto.getLastname(), signUpDto.getPassword(), null, null, null, null);
         User registeredUser = userService.register(user);
-         response = new CommonResponse(HttpStatus.OK, UserDto.fromUserToUserDto(registeredUser),
+        response = new CommonResponse(HttpStatus.OK, UserDto.fromUserToUserDto(registeredUser),
                 "New account created", 0);
         return ResponseFromServer.returnResult(response, HttpStatus.OK);
     }
@@ -93,7 +93,7 @@ public class AuthenticationController {
         CommonResponse response = null;
 
         if (user == null) {
-            response= new CommonResponse(HttpStatus.NOT_FOUND, null, "You are not authorized", 1);
+            response = new CommonResponse(HttpStatus.NOT_FOUND, null, "You are not authorized", 1);
             return ResponseFromServer.returnResult(response, HttpStatus.NOT_FOUND);
         }
 
