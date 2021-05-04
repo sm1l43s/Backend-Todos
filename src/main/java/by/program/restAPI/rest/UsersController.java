@@ -109,8 +109,6 @@ public class UsersController {
     @RequestMapping(value = "users/avatar", method = RequestMethod.POST)
     public ResponseEntity updateAvatarUser(@RequestHeader("Authorization") String bearerToken,
                                            @RequestParam("file") MultipartFile file) {
-        System.out.println("***************");
-        System.out.println(file);
         User user = utils.getUser(bearerToken);
         CommonResponse response = null;
 
