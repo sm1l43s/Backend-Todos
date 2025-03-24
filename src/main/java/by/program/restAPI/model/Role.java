@@ -6,14 +6,20 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "roles")
-@Data
-public class Role extends BaseEntity {
+public class Role extends AbstractBaseEntity {
 
     @Column(name = "name")
     private String name;
@@ -24,8 +30,8 @@ public class Role extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Role{" +
-                "id: " + super.getId() + ", " +
-                "name: " + name + "}";
+        return super.toString() + " {" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

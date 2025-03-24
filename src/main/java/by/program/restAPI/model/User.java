@@ -11,47 +11,70 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class User extends BaseEntity {
+public class User extends AbstractBaseEntity {
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
+    @NotNull
     private String email;
 
-    @Column(name = "firstname")
+    @Column(name = "firstname", nullable = false)
+    @NotNull
+    @Size(min = 1, max = 128)
     private String firstName;
 
-    @Column(name = "lastname")
+    @Column(name = "lastname", nullable = false)
+    @NotNull
+    @Size(min = 1, max = 128)
     private String lastName;
 
-    @Column(name = "password", length = 255)
+    @Column(name = "password", nullable = false)
+    @NotNull
+    @Size(min = 5)
     private String password;
 
-    @Column(name = "aboutMe", length = 2000)
+    @Column(name = "aboutMe")
+    @Size(max = 2000)
     private String aboutMe;
 
     @Lob
+    @Column(name = "avatar")
     private Byte[] avatar;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @Column(name = "is_active", nullable = false, columnDefinition = "bool default true")
+    private boolean isActive;
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @Fetch(value = FetchMode.SELECT)
-    private List<Task> taskList;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Task> tasks;
+
+    @Override
+    public String toString() {
+        return super.toString() + " {" +
+                "email='" + email + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", isActive=" + isActive +
+                '}';
+    }
 }

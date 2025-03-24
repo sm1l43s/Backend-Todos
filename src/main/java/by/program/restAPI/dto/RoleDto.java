@@ -1,16 +1,15 @@
 package by.program.restAPI.dto;
 
-import by.program.restAPI.model.Role;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoleDto {
 
     private String name;
-
-    public static RoleDto fromRoleToRoleDto(Role role) {
-        RoleDto roleDto = new RoleDto();
-        roleDto.setName(role.getName());
-        return roleDto;
-    }
 }

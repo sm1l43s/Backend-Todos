@@ -1,46 +1,28 @@
 package by.program.restAPI.dto;
 
 import by.program.restAPI.model.Status;
-import by.program.restAPI.model.Task;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@SuperBuilder
 @NoArgsConstructor
-public class TaskDto {
+@AllArgsConstructor
+public class TaskDto extends AbstractBaseEntityDto {
 
-    private long id;
     private String title;
     private String description;
     private Status status;
-    private Date startDate;
-    private Date endDate;
-
-    public static TaskDto fromTaskToTaskDto(Task task) {
-        TaskDto taskDto = new TaskDto();
-        taskDto.setId(task.getId());
-        taskDto.setTitle(task.getTitle());
-        taskDto.setDescription(task.getDescription());
-        taskDto.setStatus(task.getStatus());
-        taskDto.setStartDate(task.getStartDate());
-        taskDto.setEndDate(task.getEndDate());
-        return taskDto;
-    }
-
-    public static List<TaskDto> fromListTaskToListTaskDto(List<Task> tasks) {
-        List<TaskDto> taskDtoList = new ArrayList<>();
-
-        for (int i = 0; i < tasks.size(); i++) {
-            taskDtoList.add(fromTaskToTaskDto(tasks.get(i)));
-        }
-
-        return taskDtoList;
-    }
-
+    private LocalDate startDate;
+    private LocalDate endDate;
 }
