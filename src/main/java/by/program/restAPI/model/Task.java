@@ -1,12 +1,18 @@
 package by.program.restAPI.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
@@ -14,7 +20,7 @@ import java.sql.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Task extends BaseEntity{
+public class Task extends BaseEntity {
 
     @Column(name = "title", length = 100)
     private String title;

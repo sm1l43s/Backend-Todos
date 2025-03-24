@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: rest_api_todos
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:todo_rest_api}
+    username: ${MYSQL_USER:user}
+    password: ${MYSQL_PASSWORD:password}
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  servlet:
+    multipart:
+      max-file-size: 5500KB
+      max-request-size: 5500KB
+
+jwt:
+  token:
+    secret: ${BACKEND_TODOS_SECRET}
+    expired: 3600000
