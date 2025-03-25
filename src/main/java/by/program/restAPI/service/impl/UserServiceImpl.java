@@ -1,20 +1,23 @@
 package by.program.restAPI.service.impl;
 
+import by.program.restAPI.exception.AvatarUploadException;
+import by.program.restAPI.exception.NotFoundException;
 import by.program.restAPI.model.Role;
 import by.program.restAPI.model.Status;
 import by.program.restAPI.model.User;
 import by.program.restAPI.repository.RoleRepository;
 import by.program.restAPI.repository.UserRepository;
 import by.program.restAPI.service.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,18 +26,80 @@ import java.util.List;
 @Service
 @Transactional
 @Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
+
+    @Override
+    public User findByIdWithTaskList(Long id) {
+        return userRepository
+                .findByIdWithTaskList(id)
+                .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }
+
+    @Override
+    public User findById(Long id) {
+        log.debug("Find user with id = {}", id);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id = " + id + " not found"));
+    }
+
+    @Override
+    @Transactional
+    public boolean delete(Long id) {
+        log.debug("Attempting to delete user with id = {}", id);
+        int updatedEntities = userRepository.updateIsActiveById(id, false);
+
+        if (updatedEntities > 0) {
+            log.debug("Status was changed for user with id = {}", id);
+            log.info("User with id: {} successfully deleted", id);
+            return false;
+        } else {
+            throw new NotFoundException("Not found entity with id= " + id);
+        }
+    }
+
+    @Override
+    @Transactional
+    public boolean updateAboutMe(Long id, String aboutMe) {
+        int updatedEntities = userRepository.updateAboutMeById(id, aboutMe);
+
+        if (updatedEntities > 0) {
+            log.debug("User {} successfully updated", id);
+            return true;
+        } else {
+            throw new NotFoundException("Not found entity with id= {}" + id);
+        }
+    }
+
+    @Transactional
+    public void updateAvatar(Long id, MultipartFile file) {
+        Byte[] avatar;
+        try {
+            byte[] bytes = file.getBytes();
+            avatar = new Byte[bytes.length];
+            for (int i = 0; i < bytes.length; i++) {
+                avatar[i] = bytes[i];
+            }
+            userRepository.updateAvatarById(id, avatar);
+            log.debug("Update avatar for user with id= {}", id);
+        } catch (IOException e) {
+            throw new AvatarUploadException("Failed to process avatar file", e);
+        }
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        log.debug("Get all users by pageable");
+        return userRepository.findAllWithTaskList(pageable);
+    }
+
+
+    // TODO
 
     @Override
     public User register(User user) {
@@ -53,21 +118,6 @@ public class UserServiceImpl implements UserService {
         log.info("IN register - user: {} successfully registered", registeredUser.getEmail());
 
         return registeredUser;
-    }
-
-    @Override
-    public User update(User user) {
-        user.setUpdated(Date.valueOf(LocalDate.now()));
-        log.info("IN update - data user {} succesfully updated", user.getEmail());
-        User updateUser = userRepository.save(user);
-        return updateUser;
-    }
-
-    @Override
-    public Page<User> getAll(int page, int size) {
-        Page<User> result = userRepository.findAll(PageRequest.of(page, size));
-        log.info("IN getAll - {} users found with page - {} and size - {}", result.getContent().size(), page, size);
-        return result;
     }
 
     @Override
@@ -116,23 +166,9 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User findById(Long id) {
-        User result = userRepository.findById(id).orElse(null);
-
-        log.info("IN findById - user: {} found by id: {}", result.getEmail());
-        return result;
-    }
-
-    @Override
     public User findByIdAndStatusNot(long id, Status status) {
         User result = userRepository.findByIdAndStatusNot(id, status).orElse(null);
         log.info("IN findByIdAndStatusNot - user: {} found by id: {} and status not: {}", result.getEmail(), id, status);
         return result;
-    }
-
-    @Override
-    public void delete(Long id) {
-        userRepository.deleteById(id);
-        log.info("IN delete - user with id: {} successfully deleted");
     }
 }

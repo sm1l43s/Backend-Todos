@@ -1,8 +1,8 @@
 package by.program.restAPI.dto.forUserDto;
 
 import by.program.restAPI.dto.AbstractBaseEntityDto;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +17,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateUserDto extends AbstractBaseEntityDto {
+public class UpdateAboutMeDto extends AbstractBaseEntityDto {
 
-    private String email;
-    private String firstname;
-    private String lastname;
+    @Size(max = 2000)
     private String aboutMe;
-
 }

@@ -1,66 +1,59 @@
 package by.program.restAPI.utils;
 
-import by.program.restAPI.dto.RoleDto;
 import by.program.restAPI.dto.forUserDto.UserDto;
-import by.program.restAPI.model.Role;
 import by.program.restAPI.model.Status;
 import by.program.restAPI.model.Task;
 import by.program.restAPI.model.User;
 import lombok.experimental.UtilityClass;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class UserUtil {
 
-    public static UserDto fromUserToUserDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setEmail(user.getEmail());
-        userDto.setFirstName(user.getFirstName());
-        userDto.setLastName(user.getLastName());
-        userDto.setAboutMe(user.getAboutMe());
-        userDto.setAvatar(user.getAvatar());
-        if (user.getTasks() != null) {
-            userDto.setTotalTask(user.getTasks().size() - calculateCountTaskByStatus(user.getTasks(), Status.DELETED));
-            userDto.setActiveTask(calculateCountTaskByStatus(user.getTasks(), Status.ACTIVE));
-            userDto.setCompletedTask(calculateCountTaskByStatus(user.getTasks(), Status.COMPLETED));
-            userDto.setFailedTask(calculateCountTaskByStatus(user.getTasks(), Status.FAILED));
-        }
-        userDto.setRoles(transfer(user.getRoles()));
+    public static UserDto createDto(User user) {
 
-        return userDto;
+        return UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .aboutMe(user.getAboutMe())
+                .avatar(user.getAvatar())
+                .isActive(user.isActive())
+                .roles(RoleUtil.getDtos(user.getRoles()))
+                .build();
     }
 
-    public static List<UserDto> fromListUserToListUserDto(List<User> users) {
-        Iterator iterator = users.iterator();
-        List<UserDto> userDtoList = new ArrayList<>();
+    public static UserDto createDtoWithTaskStatistic(User user) {
+        List<Task> tasks = user.getTasks();
 
-        while (iterator.hasNext()) {
-            User user = (User) iterator.next();
-            userDtoList.add(fromUserToUserDto(user));
-        }
-
-        return userDtoList;
+        return UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .aboutMe(user.getAboutMe())
+                .avatar(user.getAvatar())
+                .isActive(user.isActive())
+                .roles(RoleUtil.getDtos(user.getRoles()))
+                .totalTask(tasks.size() - calculateCountTaskByStatus(tasks, Status.DELETED))
+                .activeTask(calculateCountTaskByStatus(tasks, Status.ACTIVE))
+                .completedTask(calculateCountTaskByStatus(tasks, Status.COMPLETED))
+                .failedTask(calculateCountTaskByStatus(tasks, Status.FAILED))
+                .build();
     }
 
-    private static List<RoleDto> transfer(List<Role> roles) {
-        List<RoleDto> roleDtoList = new ArrayList<>();
-        for (int i = 0; i < roles.size(); i++) {
-            roleDtoList.add(RoleUtil.fromRoleToRoleDto(roles.get(i)));
-        }
-        return roleDtoList;
+    public static List<UserDto> convertToDtoListWithStatistics(List<User> users) {
+        return users.stream()
+                .map(UserUtil::createDtoWithTaskStatistic)
+                .collect(Collectors.toList());
     }
 
     private static int calculateCountTaskByStatus(List<Task> tasks, Status status) {
-        if(tasks.size() == 0) return 0;
-
-        int count = 0;
-        for (Task task: tasks) {
-            if (task.getStatus().equals(status)) count++;
-        }
-        return count;
+        return (int) tasks.stream()
+                .filter(task -> task.getStatus().equals(status))
+                .count();
     }
 }
