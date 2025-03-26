@@ -7,14 +7,13 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,7 +32,7 @@ import java.time.LocalDate;
 public class Task extends AbstractBaseEntity {
 
     @Column(name = "title", length = 100)
-    @NonNull
+    @NotNull
     private String title;
 
     @Column(name = "description", length = 2000)

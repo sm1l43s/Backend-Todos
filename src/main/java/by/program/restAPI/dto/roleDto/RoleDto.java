@@ -1,4 +1,4 @@
-package by.program.restAPI.dto;
+package by.program.restAPI.dto.roleDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

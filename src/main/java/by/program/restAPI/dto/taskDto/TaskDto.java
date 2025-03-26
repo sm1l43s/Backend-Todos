@@ -1,6 +1,10 @@
-package by.program.restAPI.dto;
+package by.program.restAPI.dto.taskDto;
 
+import by.program.restAPI.dto.AbstractBaseEntityDto;
 import by.program.restAPI.model.Status;
+import by.program.restAPI.model.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -20,9 +24,25 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class TaskDto extends AbstractBaseEntityDto {
 
+    @NotBlank
     private String title;
+
+    @NotBlank
     private String description;
+
+    @NotBlank
     private Status status;
+
+    @NotNull
     private LocalDate startDate;
+
+    @NotNull
     private LocalDate endDate;
+
+    @NotNull
+    private User user;
+
+    private LocalDate created;
+
+    private LocalDate updated;
 }

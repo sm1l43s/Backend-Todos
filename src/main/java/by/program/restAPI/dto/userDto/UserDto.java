@@ -1,7 +1,7 @@
-package by.program.restAPI.dto.forUserDto;
+package by.program.restAPI.dto.userDto;
 
 import by.program.restAPI.dto.AbstractBaseEntityDto;
-import by.program.restAPI.dto.RoleDto;
+import by.program.restAPI.dto.roleDto.RoleDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

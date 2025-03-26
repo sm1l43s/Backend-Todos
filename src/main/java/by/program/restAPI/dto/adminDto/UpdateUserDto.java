@@ -1,10 +1,9 @@
-package by.program.restAPI.dto.forAdminDto;
+package by.program.restAPI.dto.adminDto;
 
 import by.program.restAPI.dto.AbstractBaseEntityDto;
-import by.program.restAPI.dto.RoleDto;
+import by.program.restAPI.dto.roleDto.RoleDto;
 import by.program.restAPI.model.Status;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

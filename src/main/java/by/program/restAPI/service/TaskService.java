@@ -6,29 +6,25 @@ import by.program.restAPI.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+
 
 public interface TaskService {
 
+    Task findById(Long id);
+
+    void delete(Long id);
+
     Task add(Task task);
 
-    Task update(Task task);
+    Task update(Long id, String title, String description, LocalDate startDate, LocalDate endDate, Status status, User user);
+
+    Page<Task> getTasksForUser(Long userId, String search, Pageable pageable);
+
+
+    //TODO
 
     long getCountByStatus(Status status);
 
     long getCountEntities();
-
-    Page<Task> getAllTaskByUser(User user, Pageable pageable);
-
-    Page<Task> getAllTaskByUserAndStatusNot(User user, Pageable pageable, Status status);
-
-    Page<Task> findAllByUserAndStatusAndStatusNot(User user, Pageable pageable, Status containsStatus, Status exceptStatus);
-
-    Page<Task> findAllByUserAndStatusNotAndTitleContaining(User user, Pageable pageable, Status status, String title);
-
-    Task getById(long id);
-
-    Task getTaskByIdAndStatusNot(long id, Status status);
-
-    void deleteById(long id);
-
 }

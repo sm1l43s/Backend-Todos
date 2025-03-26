@@ -1,4 +1,4 @@
-package by.program.restAPI.dto.forAdminDto;
+package by.program.restAPI.dto.adminDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

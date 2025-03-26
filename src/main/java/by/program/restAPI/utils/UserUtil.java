@@ -1,6 +1,6 @@
 package by.program.restAPI.utils;
 
-import by.program.restAPI.dto.forUserDto.UserDto;
+import by.program.restAPI.dto.userDto.UserDto;
 import by.program.restAPI.model.Status;
 import by.program.restAPI.model.Task;
 import by.program.restAPI.model.User;

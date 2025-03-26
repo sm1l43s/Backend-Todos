@@ -1,4 +1,4 @@
-package by.program.restAPI.dto.forUserDto;
+package by.program.restAPI.dto.userDto;
 
 import by.program.restAPI.dto.AbstractBaseEntityDto;
 import jakarta.validation.constraints.Size;

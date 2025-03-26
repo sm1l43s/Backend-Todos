@@ -36,6 +36,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByIdWithTaskList(Long id) {
+        log.debug("Find user with id = {} with task list", id);
         return userRepository
                 .findByIdWithTaskList(id)
                 .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
