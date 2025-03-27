@@ -5,10 +5,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ReportsDto {
+public class ReportDto {
 
-    private long totalTask;
-    private long totalUsers;
+    private long totalActiveUsers;
     private long newUsers;
     private long totalActiveTask;
     private long totalCompletedTask;

@@ -51,7 +51,7 @@ public class Task extends AbstractBaseEntity {
     private LocalDate endDate;
 
     @CreatedDate
-    @Column(name = "created")
+    @Column(name = "created", updatable = false)
     private LocalDate created;
 
     @LastModifiedDate

@@ -18,7 +18,19 @@ public class RoleUtil {
 
     public static RoleDto createDto(Role role) {
         RoleDto roleDto = new RoleDto();
+        roleDto.setId(role.getId());
         roleDto.setName(role.getName());
         return roleDto;
+    }
+
+    public static List<Role> getRoles(List<RoleDto> roleDtoList) {
+        return roleDtoList.stream()
+                .map(dto -> {
+                    Role role = new Role();
+                    role.setId(dto.getId());
+                    role.setName(dto.getName());
+                    return role;
+                })
+                .collect(Collectors.toList());
     }
 }

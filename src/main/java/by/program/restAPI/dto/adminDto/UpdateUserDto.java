@@ -2,7 +2,7 @@ package by.program.restAPI.dto.adminDto;
 
 import by.program.restAPI.dto.AbstractBaseEntityDto;
 import by.program.restAPI.dto.roleDto.RoleDto;
-import by.program.restAPI.model.Status;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,7 +25,9 @@ public class UpdateUserDto extends AbstractBaseEntityDto {
     private String email;
     private String firstName;
     private String lastName;
-    private Status status;
+    private boolean isActive;
     private List<RoleDto> roles;
+    @Size(max = 2000)
+    private String aboutMe;
 
 }

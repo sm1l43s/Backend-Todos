@@ -72,20 +72,9 @@ public class TaskServiceImpl implements TaskService {
                 userId, Status.DELETED, search.trim(), pageable);
     }
 
-
-    // TODO
-
     @Override
     public long getCountByStatus(Status status) {
-        long count = taskRepository.countByStatus(status);
-        log.info("IN getCountByStatus - count task: {} by status", count, status);
-        return count;
-    }
-
-    @Override
-    public long getCountEntities() {
-        long count = taskRepository.count();
-        log.info("IN getCountEntities - count task: {} ", count);
-        return count;
+        log.info("Count tasks with status {}", status);
+        return taskRepository.countByStatus(status);
     }
 }

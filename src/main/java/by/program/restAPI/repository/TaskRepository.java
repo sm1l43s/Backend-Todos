@@ -17,4 +17,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             @Param("title") String title,
             Pageable pageable
     );
+
+    long countByStatus(Status status);
 }

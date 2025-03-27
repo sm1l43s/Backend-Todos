@@ -1,132 +1,77 @@
 package by.program.restAPI.rest;
 
-import by.program.restAPI.dto.RoleDto;
-import by.program.restAPI.dto.forAdminDto.AdminUserDto;
-import by.program.restAPI.dto.forAdminDto.ReportsDto;
-import by.program.restAPI.dto.forAdminDto.UpdateUserDto;
-import by.program.restAPI.model.Role;
+
+import by.program.restAPI.dto.adminDto.AdminUserDto;
+import by.program.restAPI.dto.adminDto.ReportDto;
+import by.program.restAPI.dto.adminDto.UpdateUserDto;
 import by.program.restAPI.model.Status;
 import by.program.restAPI.model.User;
-import by.program.restAPI.responseEntity.CommonResponse;
-import by.program.restAPI.responseEntity.ResponseFromServer;
-import by.program.restAPI.responseEntity.ResponseListData;
-import by.program.restAPI.service.RoleService;
 import by.program.restAPI.service.TaskService;
 import by.program.restAPI.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import by.program.restAPI.utils.AdminUtil;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/v1/admin/")
+@Slf4j
+@RequiredArgsConstructor
+@RequestMapping(value = AdminController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdminController {
+
+    static final String REST_URL = "/api/v1/admin/";
 
     private final TaskService taskService;
     private final UserService userService;
-    private final RoleService roleService;
 
-    @Autowired
-    public AdminController(TaskService taskService, UserService userService, RoleService roleService) {
-        this.taskService = taskService;
-        this.userService = userService;
-        this.roleService = roleService;
+    @GetMapping("users")
+    public Page<AdminUserDto> getUsers(
+            @RequestParam(defaultValue = "") String search,
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        Page<User> users = search.isBlank()
+                ? userService.findAllActive(true, pageable)
+                : userService.findAllActiveAndNameContaining(true, search, pageable);
+
+        return users.map(AdminUtil::createDto);
     }
 
-    @RequestMapping(value = "reports", method = RequestMethod.GET)
-    public ResponseEntity getReports(@RequestHeader("Authorization") String bearerToken) {
+    @PutMapping(value = "users/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public void update(@PathVariable Long id, @Valid @RequestBody UpdateUserDto userDto) {
+        userService.update(id,
+                userDto.getFirstName(),
+                userDto.getLastName(),
+                userDto.getEmail(),
+                userDto.isActive(),
+                userDto.getRoles(),
+                userDto.getAboutMe());
+    }
 
-        ReportsDto reportsDto = new ReportsDto(
-                taskService.getCountEntities(),
-                userService.countEntities(),
-                userService.countUsersByBetweenDate(Date.valueOf(LocalDate.now()), getDateFewDaysAgo(1)),
+    @GetMapping("report")
+    @Transactional
+    public ReportDto getReport(@RequestParam(defaultValue = "1") int days) {
+        return new ReportDto(
+                userService.countActiveUsers(),
+                userService.countNewUsers(days),
                 taskService.getCountByStatus(Status.ACTIVE),
                 taskService.getCountByStatus(Status.COMPLETED),
                 taskService.getCountByStatus(Status.DELETED)
         );
-
-        CommonResponse commonResponse = new CommonResponse(HttpStatus.OK, reportsDto, "", 0);
-
-        return ResponseFromServer.returnResult(commonResponse, HttpStatus.OK);
     }
-
-    private Date getDateFewDaysAgo(int days) {
-        final Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, days);
-        return new Date(cal.getTimeInMillis());
-    }
-
-    @RequestMapping(value = "users", method = RequestMethod.GET)
-    public ResponseEntity getUsers(@RequestHeader("Authorization") String bearerToken,
-                                   @RequestParam(name = "page", defaultValue = "1") int page,
-                                   @RequestParam(name = "size", defaultValue = "10") int size,
-                                   @RequestParam(name = "typeOrder", defaultValue = "asc") String typeOrder,
-                                   @RequestParam(name = "orderFields", defaultValue = "id") String orderFields,
-                                   @RequestParam(name = "search", defaultValue = "") String search) {
-
-        CommonResponse response = null;
-        Page<User> data = null;
-
-        if (search.isEmpty()) {
-            if (typeOrder.equals("asc")) {
-                data = userService.getAllByStatusNot(PageRequest.of(page - 1, size, Sort.by(orderFields).ascending()),
-                        Status.DELETED);
-            } else {
-                data = userService.getAllByStatusNot(PageRequest.of(page - 1, size, Sort.by(orderFields).descending()),
-                        Status.DELETED);
-            }
-
-        } else {
-            data = userService.getAllByStatusNotAndFirstNameContainingOrLastNameContaining(PageRequest.of(page - 1, size),
-                    Status.DELETED, search, search);
-        }
-
-        if (data.isEmpty()) {
-            response = new CommonResponse(HttpStatus.OK, null, "No found users", 1);
-            return ResponseFromServer.returnResult(response, HttpStatus.OK);
-        }
-        response = new ResponseListData(HttpStatus.OK, AdminUserDto.fromListUserToListAdminUserDto(data.getContent()), "", 0, data.getTotalElements());
-        return ResponseFromServer.returnResult(response, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "users", method = RequestMethod.PUT)
-    public ResponseEntity updateUsers(@RequestHeader("Authorization") String bearerToken,
-                                      @RequestBody UpdateUserDto updateUserDto) {
-        User user = userService.findByEmail(updateUserDto.getEmail());
-        CommonResponse response = null;
-        if (user == null) {
-            response = new CommonResponse(HttpStatus.NOT_FOUND, null, "Not found user with email:" +
-                    updateUserDto.getEmail(), 1);
-            return ResponseFromServer.returnResult(response, HttpStatus.OK);
-        }
-
-        user.setRoles(getRoles(updateUserDto.getRoles()));
-        user.setStatus(updateUserDto.getStatus());
-        user.setEmail(updateUserDto.getEmail());
-        user.setFirstName(updateUserDto.getFirstName());
-        user.setLastName(updateUserDto.getLastName());
-
-        User updatedUser = userService.update(user);
-        response = new CommonResponse(HttpStatus.OK, AdminUserDto.fromUserToAdminUserDto(updatedUser), "", 0);
-
-        return ResponseFromServer.returnResult(response, HttpStatus.OK);
-    }
-
-    private List<Role> getRoles(List<RoleDto> roleDtoList) {
-        List<Role> roles = new ArrayList<>();
-        for (RoleDto roleDto : roleDtoList) {
-            roles.add(roleService.findByName(roleDto.getName()));
-        }
-        return roles;
-    }
-
 }

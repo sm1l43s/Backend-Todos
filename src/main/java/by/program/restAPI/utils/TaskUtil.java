@@ -4,9 +4,6 @@ import by.program.restAPI.dto.taskDto.TaskDto;
 import by.program.restAPI.model.Task;
 import lombok.experimental.UtilityClass;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @UtilityClass
 public class TaskUtil {
 
@@ -33,18 +30,5 @@ public class TaskUtil {
                 .created(task.getCreated())
                 .updated(task.getUpdated())
                 .build();
-    }
-
-
-    // TODO
-
-    public static List<TaskDto> fromListTaskToListTaskDto(List<Task> tasks) {
-        List<TaskDto> taskDtoList = new ArrayList<>();
-
-        for (int i = 0; i < tasks.size(); i++) {
-            taskDtoList.add(createDto(tasks.get(i)));
-        }
-
-        return taskDtoList;
     }
 }

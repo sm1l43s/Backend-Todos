@@ -1,5 +1,6 @@
 package by.program.restAPI.service.impl;
 
+import by.program.restAPI.dto.roleDto.RoleDto;
 import by.program.restAPI.exception.AvatarUploadException;
 import by.program.restAPI.exception.NotFoundException;
 import by.program.restAPI.model.Role;
@@ -8,6 +9,7 @@ import by.program.restAPI.model.User;
 import by.program.restAPI.repository.RoleRepository;
 import by.program.restAPI.repository.UserRepository;
 import by.program.restAPI.service.UserService;
+import by.program.restAPI.utils.RoleUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -93,10 +95,56 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    // Все active/not active
     @Override
     public Page<User> findAll(Pageable pageable) {
         log.debug("Get all users by pageable");
         return userRepository.findAllWithTaskList(pageable);
+    }
+
+    // Active
+    @Override
+    public Page<User> findAllActive(boolean isActive, Pageable pageable) {
+        log.info("Get all users, where status - active");
+        return userRepository.findAllActiveUsersWithTaskList(isActive, pageable);
+    }
+
+    public Page<User> findAllActiveAndNameContaining(boolean isActive, String search, Pageable pageable) {
+        log.info("Get all active users, where searching line - {}", search);
+        return userRepository.findAllActiveAndNameContainingWithTaskList(
+                isActive, search, pageable);
+    }
+
+    @Override
+    public void update(Long id, String firstName, String lastName, String email, boolean isActive, List<RoleDto> roleDtoList, String aboutMe) {
+        log.debug("Update user with id= {}", id);
+        User user = findById(id);
+        List<Role> roles = RoleUtil.getRoles(roleDtoList);
+
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setActive(isActive);
+        user.setRoles(roles);
+        user.setAboutMe(aboutMe);
+
+        userRepository.save(user);
+        log.debug("User {} successfully updated", id);
+    }
+
+    @Override
+    public long countActiveUsers() { // нужен? лог + вызов репозитория
+        log.debug("Count active users");
+        return userRepository.countActiveUsers();
+    }
+
+    @Override
+    public long countNewUsers(int days) {
+        log.debug("Count new users for {} days", days);
+        LocalDate now = LocalDate.now();
+        LocalDate fromDate = now.minusDays(days);
+
+        return userRepository.countByCreatedBetween(fromDate, now);
     }
 
 
@@ -122,37 +170,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> getAllByStatusNot(Pageable pageable, Status status) {
-        Page<User> result = userRepository.findAllByStatusNot(pageable, status);
-        log.info("IN getAllByStatusNot - {} user found with pageable - {}, where status not - {}", result, pageable, status);
-        return result;
-    }
-
-    @Override
-    public long countUsersByBetweenDate(Date start, Date end) {
-        long count = userRepository.countByCreatedLessThanAndCreatedGreaterThan(start, end);
-        log.info("IN countUsersByBetweenDate - count users: {} by between date: {} - {}", count, start, end);
-        return count;
-    }
-
-    @Override
-    public long countEntities() {
-        long count = userRepository.count();
-        log.info("IN countEntities - count all users: {}", count);
-        return count;
-    }
-
-    @Override
-    public Page<User> getAllByStatusNotAndFirstNameContainingOrLastNameContaining(Pageable pageable, Status status,
-                                                                                  String searchFirstName,
-                                                                                  String searchLastName) {
-        Page<User> result = userRepository.findAllByStatusNotAndFirstNameContainingOrLastNameContaining(pageable, status,
-                searchFirstName, searchFirstName);
-        log.info("IN getAllByStatusNotAndFirstNameContainingAndLastNameContaining - {} user found", result);
-        return result;
-    }
-
-    @Override
     public User findByEmail(String email) {
         User result = userRepository.findByEmail(email);
 
@@ -162,14 +179,6 @@ public class UserServiceImpl implements UserService {
         }
 
         log.info("IN findByEmail - user: {} found by email: {}", result.getEmail(), email);
-        return result;
-    }
-
-
-    @Override
-    public User findByIdAndStatusNot(long id, Status status) {
-        User result = userRepository.findByIdAndStatusNot(id, status).orElse(null);
-        log.info("IN findByIdAndStatusNot - user: {} found by id: {} and status not: {}", result.getEmail(), id, status);
         return result;
     }
 }

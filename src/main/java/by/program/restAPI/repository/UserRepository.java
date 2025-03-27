@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -34,20 +35,37 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.tasks",
             countQuery = "SELECT COUNT(u) FROM User u")
-    Page<User> findAllWithTaskList(Pageable pageable);
+    Page<User> findAllWithTaskList(Pageable pageable); // заменить на следующий метод с проверкой статуса
 
+    @Query(
+            value = "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.tasks WHERE u.isActive = :active",
+            countQuery = "SELECT COUNT(u) FROM User u WHERE u.isActive = :active"
+    )
+    Page<User> findAllActiveUsersWithTaskList(@Param("active") boolean active, Pageable pageable);
 
-    // TODO
-    User findByEmail(String email);
+    @Query(
+            value = """
+        SELECT DISTINCT u FROM User u
+        LEFT JOIN FETCH u.tasks
+        WHERE u.isActive <> :active AND 
+              (LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) 
+              OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))
+        """,
+            countQuery = """
+        SELECT COUNT(u) FROM User u
+        WHERE u.isActive <> :active AND 
+              (LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) 
+              OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))
+        """
+    )
+    Page<User> findAllActiveAndNameContainingWithTaskList(
+            @Param("active") boolean active,
+            @Param("search") String search,
+            Pageable pageable
+    );
 
-    Optional<User> findByIdAndStatusNot(long id, Status status);
+    @Query("SELECT COUNT(u) FROM User u WHERE u.isActive = true")
+    long countActiveUsers();
 
-    Page<User> findAllByStatusNot(Pageable pageable, Status status);
-
-    long countByCreatedLessThanAndCreatedGreaterThan(Date startDate, Date endDate);
-
-    Page<User> findAllByStatusNotAndFirstNameContainingOrLastNameContaining(Pageable pageable,
-                                                                            Status status,
-                                                                            String searchFirstName,
-                                                                            String searchLastName);
+    long countByCreatedBetween(LocalDate startDate, LocalDate endDate);
 }

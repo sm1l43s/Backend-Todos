@@ -21,10 +21,5 @@ public interface TaskService {
 
     Page<Task> getTasksForUser(Long userId, String search, Pageable pageable);
 
-
-    //TODO
-
     long getCountByStatus(Status status);
-
-    long getCountEntities();
 }
