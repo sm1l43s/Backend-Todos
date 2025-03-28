@@ -1,6 +1,5 @@
 package by.program.restAPI.repository;
 
-import by.program.restAPI.model.Status;
 import by.program.restAPI.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,9 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Optional;
+
+import static by.program.restAPI.config.SecurityConfig.PASSWORD_ENCODER;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -45,18 +45,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(
             value = """
-        SELECT DISTINCT u FROM User u
-        LEFT JOIN FETCH u.tasks
-        WHERE u.isActive <> :active AND 
-              (LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) 
-              OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))
-        """,
+                    SELECT DISTINCT u FROM User u
+                    LEFT JOIN FETCH u.tasks
+                    WHERE u.isActive <> :active AND 
+                          (LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) 
+                          OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))
+                    """,
             countQuery = """
-        SELECT COUNT(u) FROM User u
-        WHERE u.isActive <> :active AND 
-              (LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) 
-              OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))
-        """
+                    SELECT COUNT(u) FROM User u
+                    WHERE u.isActive <> :active AND 
+                          (LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) 
+                          OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))
+                    """
     )
     Page<User> findAllActiveAndNameContainingWithTaskList(
             @Param("active") boolean active,
@@ -68,4 +68,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countActiveUsers();
 
     long countByCreatedBetween(LocalDate startDate, LocalDate endDate);
+
+    Optional<User> findByEmail(String email);
+
+    default User prepareAndSaveWithPassword(User user) {
+        user.setPassword(PASSWORD_ENCODER.encode(user.getPassword()));
+        return save(user);
+    }
 }

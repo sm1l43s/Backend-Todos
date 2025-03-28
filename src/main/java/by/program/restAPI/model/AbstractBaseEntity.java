@@ -17,7 +17,7 @@ import org.hibernate.Hibernate;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractBaseEntity {
+public abstract class AbstractBaseEntity implements Entity {
 
     @Id
     @Column(name = "id")

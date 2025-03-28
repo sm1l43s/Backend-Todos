@@ -4,23 +4,21 @@ import by.program.restAPI.dto.roleDto.RoleDto;
 import by.program.restAPI.exception.AvatarUploadException;
 import by.program.restAPI.exception.NotFoundException;
 import by.program.restAPI.model.Role;
-import by.program.restAPI.model.Status;
 import by.program.restAPI.model.User;
 import by.program.restAPI.repository.RoleRepository;
 import by.program.restAPI.repository.UserRepository;
 import by.program.restAPI.service.UserService;
 import by.program.restAPI.utils.RoleUtil;
+import by.program.restAPI.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +31,30 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
 
+    @Override
+    public User create(String email, String password, String firstName, String lastName) {
+        log.debug("Create new user");
+
+        Role roleUser = roleRepository.findByName("ROLE_USER");
+        List<Role> userRoles = new ArrayList<>();
+        userRoles.add(roleUser);
+
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setPassword(password);
+        newUser.setRoles(userRoles);
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
+        newUser.setActive(true);
+
+        ValidationUtil.validate(newUser);
+        newUser = userRepository.prepareAndSaveWithPassword(newUser);
+
+        log.info("New user with id {} and email {} successfully created", newUser.getId(), email);
+
+        return newUser;
+    }
 
     @Override
     public User findByIdWithTaskList(Long id) {
@@ -145,40 +165,5 @@ public class UserServiceImpl implements UserService {
         LocalDate fromDate = now.minusDays(days);
 
         return userRepository.countByCreatedBetween(fromDate, now);
-    }
-
-
-    // TODO
-
-    @Override
-    public User register(User user) {
-        Role roleUser = roleRepository.findByName("ROLE_USER");
-        List<Role> userRoles = new ArrayList<>();
-        userRoles.add(roleUser);
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(userRoles);
-        user.setStatus(Status.ACTIVE);
-        user.setCreated(Date.valueOf(LocalDate.now()));
-        user.setUpdated(Date.valueOf(LocalDate.now()));
-
-        User registeredUser = userRepository.save(user);
-
-        log.info("IN register - user: {} successfully registered", registeredUser.getEmail());
-
-        return registeredUser;
-    }
-
-    @Override
-    public User findByEmail(String email) {
-        User result = userRepository.findByEmail(email);
-
-        if (result == null) {
-            log.warn("IN findByEmail - no user found by email: {}", email);
-            return null;
-        }
-
-        log.info("IN findByEmail - user: {} found by email: {}", result.getEmail(), email);
-        return result;
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -64,6 +65,7 @@ public class UserController {
         userService.updateAvatar(id, file);
     }
 
+    // Учесть статус DELETED
     @GetMapping
     public Page<UserDto> getAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
         Page<User> users = userService.findAll(pageable);
@@ -77,6 +79,12 @@ public class UserController {
             @PageableDefault(size = 50, sort = "startDate", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<Task> tasks = taskService.getTasksForUser(id, search, pageable);
         return tasks.map(TaskUtil::createDto);
+    }
+
+    @GetMapping("/profile")
+    public UserDto getMe(@AuthenticationPrincipal AuthUser authUser) {
+        User user = userService.findById(authUser.id());
+        return UserUtil.createDtoWithTaskStatistic(user);
     }
 
     // TODO

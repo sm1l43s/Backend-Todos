@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface UserService {
 
+    User findById(Long id);
+
     User findByIdWithTaskList(Long id);
 
     boolean updateAboutMe(Long id, String aboutMe);
@@ -30,10 +32,5 @@ public interface UserService {
 
     long countNewUsers(int days);
 
-    // TODO
-    User register(User user);
-
-    User findById(Long id);
-
-    User findByEmail(String email);
+    User create(String email, String password, String firstName, String lastName);
 }
