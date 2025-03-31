@@ -45,25 +45,6 @@ public class UserController {
         return UserUtil.createDtoWithTaskStatistic(user);
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable long id) {
-        userService.delete(id);
-    }
-
-    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable long id, @Valid @RequestBody UpdateAboutMeDto updateAboutMeDto) {
-        String aboutMe = updateAboutMeDto.getAboutMe();
-        userService.updateAboutMe(id, aboutMe);
-    }
-
-    @PatchMapping(value = "/{id}/avatar", consumes = MediaType.TEXT_PLAIN_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public void updateAvatar(@PathVariable long id, @RequestBody String avatarPath) {
-        userService.updateAvatar(id, avatarPath);
-    }
-
     // Учесть статус DELETED
     @GetMapping
     public Page<UserDto> getAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
@@ -80,21 +61,4 @@ public class UserController {
         return tasks.map(TaskUtil::createDto);
     }
 
-    @GetMapping("/profile")
-    public UserDto getMe(@AuthenticationPrincipal AuthUser authUser) {
-        User user = userService.findById(authUser.id());
-        return UserUtil.createDtoWithTaskStatistic(user);
-    }
-
-    // TODO
-//    @PutMapping(value = "/{id}/password", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseStatus(HttpStatus.OK)
-//    @Transactional
-//    public void changePassword(@Valid @RequestBody UserDto userDto, @PathVariable Long id, @AuthenticationPrincipal AuthUser authUser) {
-//        log.debug("Change password for user {} with id={}", userDto, id);
-//        if (!username.equals(authUser.getUser().getUsername())) {
-//            throw new AuthenticationException("You can't change password for user " + id);
-//        }
-//        traineeService.changePassword(username, userDto.getNewPassword());
-//    }
 }
