@@ -8,7 +8,6 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -56,9 +55,8 @@ public class User extends AbstractBaseEntity {
     @Size(max = 2000)
     private String aboutMe;
 
-    @Lob
-    @Column(name = "avatar")
-    private Byte[] avatar;
+    @Column(name = "avatar", length = 255)
+    private String avatar;
 
     @Column(name = "is_active", nullable = false, columnDefinition = "bool default true")
     private boolean isActive;

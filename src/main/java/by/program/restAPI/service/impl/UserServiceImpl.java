@@ -1,7 +1,6 @@
 package by.program.restAPI.service.impl;
 
 import by.program.restAPI.dto.roleDto.RoleDto;
-import by.program.restAPI.exception.AvatarUploadException;
 import by.program.restAPI.exception.NotFoundException;
 import by.program.restAPI.model.Role;
 import by.program.restAPI.model.User;
@@ -16,9 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,18 +97,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void updateAvatar(Long id, MultipartFile file) {
-        Byte[] avatar;
-        try {
-            byte[] bytes = file.getBytes();
-            avatar = new Byte[bytes.length];
-            for (int i = 0; i < bytes.length; i++) {
-                avatar[i] = bytes[i];
-            }
-            userRepository.updateAvatarById(id, avatar);
-            log.debug("Update avatar for user with id= {}", id);
-        } catch (IOException e) {
-            throw new AvatarUploadException("Failed to process avatar file", e);
+    public void updateAvatar(Long id, String avatarUri) {
+        int updatedEntities = userRepository.updateAvatarById(id, avatarUri);
+
+        if (updatedEntities > 0) {
+            log.debug("Avatar successfully updated for user with id {}", id);
+        } else {
+            throw new NotFoundException("Not found entity with id= {}" + id);
         }
     }
 

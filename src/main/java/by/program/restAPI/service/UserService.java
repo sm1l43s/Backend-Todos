@@ -16,7 +16,7 @@ public interface UserService {
 
     boolean updateAboutMe(Long id, String aboutMe);
 
-    void updateAvatar(Long id, MultipartFile file);
+    void updateAvatar(Long id, String avatar);
 
     Page<User> findAll(Pageable pageable);
 

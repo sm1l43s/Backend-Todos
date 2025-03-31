@@ -27,7 +27,7 @@ public class UserDto extends AbstractBaseEntityDto {
     private String firstName;
     private String lastName;
     private String aboutMe;
-    private Byte[] avatar;
+    private String avatar;
     private boolean isActive;
     private List<RoleDto> roles;
     private int totalTask;

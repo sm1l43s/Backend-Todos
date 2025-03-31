@@ -31,7 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Query("UPDATE User u SET u.avatar = :avatar WHERE u.id = :id")
-    int updateAvatarById(@Param("id") Long id, @Param("avatar") Byte[] avatar);
+    int updateAvatarById(@Param("id") Long id, @Param("avatar") String avatar);
 
     @Query(value = "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.tasks",
             countQuery = "SELECT COUNT(u) FROM User u")
