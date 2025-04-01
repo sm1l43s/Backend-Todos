@@ -30,8 +30,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
-import static by.program.restAPI.utils.ValidationUtil.checkNew;
-
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -64,7 +62,6 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<LoginRequestDto> signUp(@Valid @RequestBody SignUpDto signUpDto) {
         log.debug("Register a new user {}", signUpDto);
-        checkNew(signUpDto);
 
         User newUser = userService.create(
                 signUpDto.getEmail(),

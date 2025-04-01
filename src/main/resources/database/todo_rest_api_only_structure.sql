@@ -32,14 +32,14 @@ VALUES ('ROLE_USER'),
 CREATE TABLE users
 (
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    email     VARCHAR(255) NOT NULL,
+    email     VARCHAR(255) NOT NULL UNIQUE,
     firstname VARCHAR(128) NOT NULL,
     lastname  VARCHAR(128) NOT NULL,
     password  VARCHAR(255) NOT NULL,
-    aboutMe   VARCHAR(2000),
+    about_me   VARCHAR(2000),
     avatar    BLOB,
     is_active BOOLEAN      NOT NULL DEFAULT TRUE,
-    created   DATE                  DEFAULT CURRENT_DATE
+    created   DATE                  DEFAULT (CURRENT_DATE)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -69,9 +69,9 @@ CREATE TABLE tasks
     title       VARCHAR(100) NOT NULL,
     description VARCHAR(2000),
     user_id     BIGINT       NOT NULL,
-    startDate   DATE,
-    endDate     DATE,
-    created     DATE DEFAULT CURRENT_DATE,
+    start_date   DATE,
+    end_date     DATE,
+    created     DATE DEFAULT (CURRENT_DATE),
     updated     DATE,
     status      VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE

@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.Collections;
 import java.util.Optional;
 
 public class AuthUser extends org.springframework.security.core.userdetails.User {
@@ -21,7 +21,13 @@ public class AuthUser extends org.springframework.security.core.userdetails.User
     private String token;
 
     public AuthUser(@NonNull User user) {
-        super(user.getEmail(), user.getPassword(), Collections.EMPTY_LIST);
+        super(
+                user.getEmail(),
+                user.getPassword(),
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getName()))
+                        .toList()
+        );
         this.user = user;
     }
 

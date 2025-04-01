@@ -27,12 +27,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class) // в когнфиге нужна @EnableJpaAuditing
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "users")
 public class User extends AbstractBaseEntity {
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     @NotNull
     private String email;
 
@@ -51,7 +51,7 @@ public class User extends AbstractBaseEntity {
     @Size(min = 5)
     private String password;
 
-    @Column(name = "aboutMe")
+    @Column(name = "about_me")
     @Size(max = 2000)
     private String aboutMe;
 

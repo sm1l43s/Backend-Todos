@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SignUpDto extends AbstractBaseEntityDto {
+public class SignUpDto {
 
     @NotBlank
     private String email;

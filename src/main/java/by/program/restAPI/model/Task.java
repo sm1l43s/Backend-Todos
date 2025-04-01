@@ -44,10 +44,10 @@ public class Task extends AbstractBaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "startDate")
+    @Column(name = "start_date")
     private LocalDate startDate;
 
-    @Column(name = "endDate")
+    @Column(name = "end_date")
     private LocalDate endDate;
 
     @CreatedDate

@@ -22,7 +22,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -71,19 +70,7 @@ public class ProfileController {
             @RequestParam(defaultValue = "") String search,
             @PageableDefault(size = 50, sort = "startDate", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<Task> tasks = taskService.getTasksForUser(authUser.id(), search, pageable);
-        return tasks.map(TaskUtil::createDto);
+        User user = userService.findById(authUser.id());
+        return tasks.map(task -> TaskUtil.createDto(task, user));
     }
-
-
-    // TODO
-//    @PutMapping(value = "/{id}/password", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseStatus(HttpStatus.OK)
-//    @Transactional
-//    public void changePassword(@Valid @RequestBody UserDto userDto, @PathVariable Long id, @AuthenticationPrincipal AuthUser authUser) {
-//        log.debug("Change password for user {} with id={}", userDto, id);
-//        if (!username.equals(authUser.getUser().getUsername())) {
-//            throw new AuthenticationException("You can't change password for user " + id);
-//        }
-//        traineeService.changePassword(username, userDto.getNewPassword());
-//    }
 }

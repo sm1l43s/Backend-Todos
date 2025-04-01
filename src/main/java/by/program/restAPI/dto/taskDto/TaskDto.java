@@ -2,7 +2,6 @@ package by.program.restAPI.dto.taskDto;
 
 import by.program.restAPI.dto.AbstractBaseEntityDto;
 import by.program.restAPI.model.Status;
-import by.program.restAPI.model.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -40,7 +39,7 @@ public class TaskDto extends AbstractBaseEntityDto {
     private LocalDate endDate;
 
     @NotNull
-    private User user;
+    private long userId;
 
     private LocalDate created;
 

@@ -34,12 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = AdminController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdminController {
 
-    static final String REST_URL = "/api/v1/admin/";
+    static final String REST_URL = "/api/v1/admin";
 
     private final TaskService taskService;
     private final UserService userService;
 
-    @GetMapping("users")
+    @GetMapping("/users")
     public Page<AdminUserDto> getUsers(
             @RequestParam(defaultValue = "") String search,
             @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
@@ -51,7 +51,7 @@ public class AdminController {
         return users.map(AdminUtil::createDto);
     }
 
-    @PutMapping(value = "users/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/users/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable Long id, @Valid @RequestBody UpdateUserDto userDto) {
         userService.update(id,
@@ -63,7 +63,7 @@ public class AdminController {
                 userDto.getAboutMe());
     }
 
-    @GetMapping("report")
+    @GetMapping("/report")
     @Transactional
     public ReportDto getReport(@RequestParam(defaultValue = "1") int days) {
         return new ReportDto(

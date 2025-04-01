@@ -32,14 +32,14 @@ VALUES (1, 'ROLE_USER'),
 CREATE TABLE users
 (
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    email     VARCHAR(255) NOT NULL,
+    email     VARCHAR(255) NOT NULL UNIQUE,
     firstname VARCHAR(128) NOT NULL,
     lastname  VARCHAR(128) NOT NULL,
     password  VARCHAR(255) NOT NULL,
-    aboutMe   VARCHAR(2000),
+    about_me   VARCHAR(2000),
     avatar    VARCHAR(255),
     is_active BOOLEAN      NOT NULL DEFAULT TRUE,
-    created   DATE                  DEFAULT CURRENT_DATE
+    created   DATE                  DEFAULT (CURRENT_DATE)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -48,12 +48,12 @@ CREATE TABLE users
 --
 
 INSERT INTO users (id, email, firstname, lastname, password,
-                   aboutMe, avatar, is_active, created)
+                   about_me, avatar, is_active, created)
 VALUES (1,
         'tanya@gmail.com',
         'Tatyana',
         'Emeyanovich',
-        '$2a$10$cqx7JMC9YyJ3nXON/2sv0.qUpIq68Syd7fFW3MTS2OZEt59uFEl4e',
+        '{bcrypt}$2a$10$cqx7JMC9YyJ3nXON/2sv0.qUpIq68Syd7fFW3MTS2OZEt59uFEl4e',
         'vsu.by',
         'https://mydomain.com/images/user_1.png',
         true,
@@ -62,7 +62,7 @@ VALUES (1,
         'klimko@gmail.com',
         'Yuriy',
         'Klimko',
-        '$2a$10$iNtgOvYXgkWUk1tKyTPS/OG6x3k0Vx3VCLG7lXKnQsmzjQvoBXKqe',
+        '{bcrypt}$2a$10$iNtgOvYXgkWUk1tKyTPS/OG6x3k0Vx3VCLG7lXKnQsmzjQvoBXKqe',
         'vsu.by, course 1',
         'https://mydomain.com/images/user_2.png',
         true,
@@ -80,9 +80,9 @@ CREATE TABLE tasks
     title       VARCHAR(100) NOT NULL,
     description VARCHAR(2000),
     user_id     BIGINT       NOT NULL,
-    startDate   DATE,
-    endDate     DATE,
-    created     DATE DEFAULT CURRENT_DATE,
+    start_date   DATE,
+    end_date     DATE,
+    created     DATE DEFAULT (CURRENT_DATE),
     updated     DATE,
     status      VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
@@ -94,7 +94,7 @@ CREATE TABLE tasks
 --
 
 INSERT INTO tasks (title, description, user_id,
-                   startDate, endDate, created, updated, status)
+                   start_date, end_date, created, updated, status)
 VALUES ('Learn CSS', 'Learn CSS by Book Devid McFarland', 1, '2025-02-06', '2025-02-26', '2025-02-06', '2025-02-06', 'ACTIVE'),
        ('Learn HTML', 'Learn HTML by course on service \'htmlacademy.ru\'', 1, '2025-02-10', '2025-02-20', '2025-02-10', '2025-02-10', 'COMPLETED'),
        ('Learn JS', 'Learn JS by course on website \'learnjs.ru\'', 1, '2025-03-02', '2025-03-20', '2025-03-02', '2025-05-08', 'ACTIVE'),

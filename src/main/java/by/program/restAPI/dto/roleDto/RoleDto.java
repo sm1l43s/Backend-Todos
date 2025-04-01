@@ -1,6 +1,7 @@
 package by.program.restAPI.dto.roleDto;
 
 import by.program.restAPI.dto.AbstractBaseEntityDto;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,5 +19,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class RoleDto extends AbstractBaseEntityDto {
 
+    @NotBlank
     private String name;
 }

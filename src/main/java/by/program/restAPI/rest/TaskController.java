@@ -2,7 +2,9 @@ package by.program.restAPI.rest;
 
 import by.program.restAPI.dto.taskDto.TaskDto;
 import by.program.restAPI.model.Task;
+import by.program.restAPI.model.User;
 import by.program.restAPI.service.TaskService;
+import by.program.restAPI.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +32,12 @@ public class TaskController {
     static final String REST_URL = "/api/v1/users/tasks";
 
     private final TaskService taskService;
+    private final UserService userService;
 
     @GetMapping("/{taskId}")
     public TaskDto get(@PathVariable Long taskId) {
         Task task = taskService.findById(taskId);
-        return createDto(task);
+        return createDto(task, task.getUser());
     }
 
     @DeleteMapping("/{taskId}")
@@ -46,10 +49,11 @@ public class TaskController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public TaskDto create(@Valid @RequestBody TaskDto taskDto) {
-        Task task = createTask(taskDto);
+        User user = userService.findById(taskDto.getUserId());
+        Task task = createTask(taskDto, user);
         Task savedtask = taskService.add(task);
 
-        return createDto(savedtask);
+        return createDto(savedtask, user);
 
     }
 
@@ -57,16 +61,16 @@ public class TaskController {
     @ResponseStatus(HttpStatus.OK)
     public TaskDto update(@PathVariable long taskId, @Valid @RequestBody TaskDto taskDto) {
 
+        User user = userService.findById(taskDto.getUserId());
+
         Task updatedTask = taskService.update(taskId,
                 taskDto.getTitle(),
                 taskDto.getDescription(),
                 taskDto.getStartDate(),
                 taskDto.getEndDate(),
                 taskDto.getStatus(),
-                taskDto.getUser());
+                user);
 
-        return createDto(updatedTask);
+        return createDto(updatedTask, user);
     }
-
-    // Метод получения списка задач для текущего юзера ??
 }
