@@ -13,6 +13,7 @@ public class TaskUtil {
         Task task = new Task();
         task.setTitle(taskDto.getTitle());
         task.setDescription(taskDto.getDescription());
+        task.setStartDate(taskDto.getStartDate());
         task.setEndDate(taskDto.getEndDate());
         task.setUser(user);
 

@@ -42,16 +42,8 @@ public class AuthUser extends org.springframework.security.core.userdetails.User
         return safeGet().orElseThrow(() -> new NotFoundException("No authorized user found"));
     }
 
-    public static long authId() {
-        return get().id();
-    }
-
     public long id() {
         return user.getId();
-    }
-
-    public static String getJwtToken() {
-        return get().getToken();
     }
 
     @Override

@@ -11,8 +11,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,26 +31,18 @@ import java.util.List;
 public class User extends AbstractBaseEntity {
 
     @Column(name = "email", nullable = false, unique = true)
-    @NotNull
     private String email;
 
     @Column(name = "firstname", nullable = false)
-    @NotNull
-    @Size(min = 1, max = 128)
     private String firstName;
 
     @Column(name = "lastname", nullable = false)
-    @NotNull
-    @Size(min = 1, max = 128)
     private String lastName;
 
     @Column(name = "password", nullable = false)
-    @NotNull
-    @Size(min = 5)
     private String password;
 
     @Column(name = "about_me")
-    @Size(max = 2000)
     private String aboutMe;
 
     @Column(name = "avatar", length = 255)

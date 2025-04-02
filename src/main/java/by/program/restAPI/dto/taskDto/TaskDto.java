@@ -29,7 +29,7 @@ public class TaskDto extends AbstractBaseEntityDto {
     @NotBlank
     private String description;
 
-    @NotBlank
+    @NotNull
     private Status status;
 
     @NotNull

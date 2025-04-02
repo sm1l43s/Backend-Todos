@@ -1,7 +1,5 @@
 package by.program.restAPI.utils;
 
-import by.program.restAPI.exception.IllegalRequestDataException;
-import by.program.restAPI.model.Entity;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
@@ -31,11 +29,5 @@ public class ValidationUtil {
     public static <T> void validate(T bean) {
         Set<ConstraintViolation<T>> violations = validator.validate(bean);
         validateConstraints(violations);
-    }
-
-    public static void checkNew(Entity bean) {
-        if (!bean.isNew()) {
-            throw new IllegalRequestDataException(bean.getClass().getSimpleName() + " must be new (id=null)");
-        }
     }
 }

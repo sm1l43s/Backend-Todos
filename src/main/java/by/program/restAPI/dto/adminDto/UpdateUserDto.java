@@ -30,9 +30,11 @@ public class UpdateUserDto extends AbstractBaseEntityDto {
     private String email;
 
     @NotBlank
+    @Size(min = 1, max = 128)
     private String firstName;
 
     @NotBlank
+    @Size(min = 1, max = 128)
     private String lastName;
 
     @NotNull

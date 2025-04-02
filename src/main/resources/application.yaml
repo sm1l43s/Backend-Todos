@@ -21,3 +21,16 @@ jwt:
   token:
     secret: ${BACKEND_TODOS_SECRET}
     expired: 3600000
+
+cors:
+  allowed-origins:
+    - "http://localhost"
+  allowed-methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "PATCH"
+    - "DELETE"
+  allowed-headers:
+    - "Authorization"
+    - "Content-Type"

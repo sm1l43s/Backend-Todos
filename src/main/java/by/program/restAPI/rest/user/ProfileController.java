@@ -1,10 +1,11 @@
-package by.program.restAPI.rest;
+package by.program.restAPI.rest.user;
 
 import by.program.restAPI.dto.taskDto.TaskDto;
 import by.program.restAPI.dto.userDto.UpdateAboutMeDto;
 import by.program.restAPI.dto.userDto.UserDto;
 import by.program.restAPI.model.Task;
 import by.program.restAPI.model.User;
+import by.program.restAPI.rest.AuthUser;
 import by.program.restAPI.service.TaskService;
 import by.program.restAPI.service.UserService;
 import by.program.restAPI.utils.TaskUtil;
@@ -19,6 +20,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -41,6 +43,7 @@ public class ProfileController {
 
     @GetMapping()
     public UserDto getMe(@AuthenticationPrincipal AuthUser authUser) {
+        log.debug("Get current user with id {}", authUser.id());
         User user = userService.findByIdWithTaskList(authUser.id());
         return UserUtil.createDtoWithTaskStatistic(user);
     }
@@ -48,12 +51,14 @@ public class ProfileController {
     @DeleteMapping()
     @ResponseStatus(HttpStatus.OK)
     public void delete(@AuthenticationPrincipal AuthUser authUser) {
+        log.debug("Delete current user with id {}", authUser.id());
         userService.delete(authUser.id());
     }
 
     @PatchMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void update(@Valid @RequestBody UpdateAboutMeDto updateAboutMeDto, @AuthenticationPrincipal AuthUser authUser) {
+        log.debug("Update current user with id {}", authUser.id());
         String aboutMe = updateAboutMeDto.getAboutMe();
         userService.updateAboutMe(authUser.id(), aboutMe);
     }
@@ -61,14 +66,17 @@ public class ProfileController {
     @PatchMapping(value = "/avatar", consumes = MediaType.TEXT_PLAIN_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void updateAvatar(@RequestBody String avatarPath, @AuthenticationPrincipal AuthUser authUser) {
+        log.debug("Update avatar for current user with id {}", authUser.id());
         userService.updateAvatar(authUser.id(), avatarPath);
     }
 
     @GetMapping("/tasks")
+    @Transactional
     public Page<TaskDto> getTaskUser(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(defaultValue = "") String search,
             @PageableDefault(size = 50, sort = "startDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        log.debug("Get tasks for current user with id {}", authUser.id());
         Page<Task> tasks = taskService.getTasksForUser(authUser.id(), search, pageable);
         User user = userService.findById(authUser.id());
         return tasks.map(task -> TaskUtil.createDto(task, user));

@@ -10,7 +10,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +31,6 @@ import java.time.LocalDate;
 public class Task extends AbstractBaseEntity {
 
     @Column(name = "title", length = 100)
-    @NotNull
     private String title;
 
     @Column(name = "description", length = 2000)

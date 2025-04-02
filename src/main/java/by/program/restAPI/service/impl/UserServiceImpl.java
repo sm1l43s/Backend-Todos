@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -30,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
 
     @Override
+    @Transactional
     public User create(String email, String password, String firstName, String lastName) {
         log.debug("Create new user");
 
@@ -75,7 +75,6 @@ public class UserServiceImpl implements UserService {
         int updatedEntities = userRepository.updateIsActiveById(id, false);
 
         if (updatedEntities > 0) {
-            log.debug("Status was changed for user with id = {}", id);
             log.info("User with id: {} successfully deleted", id);
             return false;
         } else {
@@ -86,10 +85,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public boolean updateAboutMe(Long id, String aboutMe) {
+        log.debug("Update information about user with id {}", id);
         int updatedEntities = userRepository.updateAboutMeById(id, aboutMe);
 
         if (updatedEntities > 0) {
-            log.debug("User {} successfully updated", id);
+            log.debug("Information successfully updated for user with id {}", id);
             return true;
         } else {
             throw new NotFoundException("Not found entity with id= {}" + id);
@@ -98,6 +98,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public void updateAvatar(Long id, String avatarUri) {
+        log.debug("Update avatar for user with id {}", id);
         int updatedEntities = userRepository.updateAvatarById(id, avatarUri);
 
         if (updatedEntities > 0) {
@@ -107,14 +108,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    // Все active/not active
     @Override
     public Page<User> findAll(Pageable pageable) {
         log.debug("Get all users by pageable");
         return userRepository.findAllWithTaskList(pageable);
     }
 
-    // Active
     @Override
     public Page<User> findAllActive(boolean isActive, Pageable pageable) {
         log.info("Get all users, where status - active");
@@ -128,6 +127,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void update(Long id, String firstName, String lastName, String email, boolean isActive, List<RoleDto> roleDtoList, String aboutMe) {
         log.debug("Update user with id= {}", id);
         User user = findById(id);
@@ -137,7 +137,8 @@ public class UserServiceImpl implements UserService {
         user.setLastName(lastName);
         user.setEmail(email);
         user.setActive(isActive);
-        user.setRoles(roles);
+        user.getRoles().clear();
+        user.getRoles().addAll(roles);
         user.setAboutMe(aboutMe);
 
         userRepository.save(user);
@@ -145,7 +146,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public long countActiveUsers() { // нужен? лог + вызов репозитория
+    public long countActiveUsers() {
         log.debug("Count active users");
         return userRepository.countActiveUsers();
     }

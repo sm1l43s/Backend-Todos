@@ -1,4 +1,4 @@
-package by.program.restAPI.rest;
+package by.program.restAPI.rest.task;
 
 import by.program.restAPI.dto.taskDto.TaskDto;
 import by.program.restAPI.model.Task;
@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +37,7 @@ public class TaskController {
 
     @GetMapping("/{taskId}")
     public TaskDto get(@PathVariable Long taskId) {
+        log.debug("Get task with id {}", taskId);
         Task task = taskService.findById(taskId);
         return createDto(task, task.getUser());
     }
@@ -43,24 +45,28 @@ public class TaskController {
     @DeleteMapping("/{taskId}")
     @ResponseStatus(HttpStatus.OK)
     public void delete(@PathVariable Long taskId) {
+        log.debug("Delete task with id {}", taskId);
         taskService.delete(taskId);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @Transactional
     public TaskDto create(@Valid @RequestBody TaskDto taskDto) {
+        log.debug("Create new task");
+
         User user = userService.findById(taskDto.getUserId());
         Task task = createTask(taskDto, user);
         Task savedtask = taskService.add(task);
 
         return createDto(savedtask, user);
-
     }
 
     @PutMapping(value = "/{taskId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @Transactional
     public TaskDto update(@PathVariable long taskId, @Valid @RequestBody TaskDto taskDto) {
-
+        log.debug("Update task with id {}", taskId);
         User user = userService.findById(taskDto.getUserId());
 
         Task updatedTask = taskService.update(taskId,

@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 @Service
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
@@ -25,6 +24,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task findById(Long id) {
+        log.debug("Find task with id={}", id);
         return taskRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Task with id = " + id + " not found"));
     }
@@ -42,11 +42,12 @@ public class TaskServiceImpl implements TaskService {
         task.setUpdated(LocalDate.now());
         task.setStatus(Status.ACTIVE);
         Task savedTask = taskRepository.save(task);
-        log.info("Task: {} successfully add", task.getTitle());
+        log.info("Task: {} successfully added", task.getTitle());
         return savedTask;
     }
 
     @Override
+    @Transactional
     public Task update(Long id, String title, String description, LocalDate startDate, LocalDate endDate, Status status, User user) {
         log.debug("Update task with id = {}", id);
 

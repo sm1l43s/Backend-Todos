@@ -1,10 +1,11 @@
-package by.program.restAPI.rest;
+package by.program.restAPI.rest.user;
 
 import by.program.restAPI.dto.SignUpDto;
 import by.program.restAPI.dto.authDto.AuthResponseDto;
 import by.program.restAPI.dto.authDto.LoginRequestDto;
 import by.program.restAPI.dto.userDto.UserDto;
 import by.program.restAPI.model.User;
+import by.program.restAPI.rest.AuthUser;
 import by.program.restAPI.security.JWTProvider;
 import by.program.restAPI.service.UserService;
 import by.program.restAPI.utils.UserUtil;
@@ -19,7 +20,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +42,6 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/login")
-    @Transactional
     public AuthResponseDto authenticate(@RequestBody LoginRequestDto loginRequest) {
         String email = loginRequest.getEmail();
         log.info("Attempt to login by user: {}", email);
