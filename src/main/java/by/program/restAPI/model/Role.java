@@ -1,31 +1,28 @@
 package by.program.restAPI.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import java.util.List;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "roles")
-@Data
-public class Role extends BaseEntity {
+public class Role extends AbstractBaseEntity {
 
     @Column(name = "name")
     private String name;
 
-    @JsonBackReference
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    private List<User> users;
-
     @Override
     public String toString() {
-        return "Role{" +
-                "id: " + super.getId() + ", " +
-                "name: " + name + "}";
+        return super.toString() + " {" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

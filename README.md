@@ -1,18 +1,16 @@
 # REST API Todos
 ## General info
-REST API scheduling tasks. Its allows you to focus on the important and urgent
-things. Tasks can be collected into lists and projects, marked with different colors and levels
-of importance.
+REST API for scheduling tasks. Allows you to focus on important and urgent things. Tasks can be organized into lists and projects.
 
 ## Technologies
-* Java - version 8
-* Spring Boot - version 2.1.4
-* Spring Data JPA - version 2.1.4
-* Spring Security - version 2.1.4
-* MySQL - version 5.7
-* Apache Maven - version 3.9.1
+* Java 21
+* Spring Boot 3.4.3
+* Spring Data JPA
+* Spring Security
+* MySQL 8.0
+* Apache Maven
 * Project Lombok
-* jsonwebtoken - version 0.8.0
+* JSON Web Token (jjwt) 0.11.5
 
 ## Setup and Installation
 
@@ -31,16 +29,8 @@ sudo apt update
 sudo snap install postman
 sudo apt install mysql-server
 ```
-3. #### (Optional) Update database configurations in application.properties
-If you have changed defualt user for creating database with some different username and password, update the src/main/resources/application.properties file accordingly:
-```
-spring.jpa.hibernate.ddl-auto=update #for first time running MUST be set to create, for every consecutive time set to update (if you care to have permanent database, otherwise it is deleted after every consecutive jar run)
-spring.datasource.url=jdbc:mysql://localhost:3306/todo_rest_api
-spring.datasource.username=root
-spring.datasource.password=root
-```
 
-4. #### Run the spring boot application
+3. #### Run the spring boot application
 If you download/clone repo elsewhere, change path update accordingly
 ```
 cd Backend-Rodos
@@ -49,4 +39,37 @@ java -jar target/rest_api_todos-0.0.1.jar
 ```
 this runs at port 8080 and hence all endpoints can be accessed starting from http://localhost:8080
 
-6. #### Create database objects (If you want some prerecorded values in local database)
+4. #### Load Database with Sample Data
+
+
+1. Start MySQL via Docker
+
+Make sure Docker is installed and run docker-compose.yml in the root of the project:
+
+docker-compose up -d
+
+2. Open MySQL Command Line
+
+Using MySQL 8.0 Command Line Client (or any DB tool like DBeaver):
+
+3. Select and use the database:
+
+SHOW DATABASES;
+USE todo_rest_api;
+
+4. Import structure or structure with test data
+
+* Only structure
+
+SOURCE C:/IntelliJ IDEA workspace/Backend-Todos/src/main/resources/database/todo_rest_api_only_structure.sql;
+* Structure with test data
+
+SOURCE C:/IntelliJ IDEA workspace/Backend-Todos/src/main/resources/database/todo_rest_api_with_data.sql;
+
+5. Check that data was inserted:
+
+SHOW TABLES;
+SELECT * FROM roles;
+
+You are now ready to explore the API!
+

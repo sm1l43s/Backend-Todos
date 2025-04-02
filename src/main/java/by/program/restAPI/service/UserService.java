@@ -1,36 +1,36 @@
 package by.program.restAPI.service;
 
-import by.program.restAPI.model.Status;
+import by.program.restAPI.dto.roleDto.RoleDto;
 import by.program.restAPI.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Date;
+import java.util.List;
 
 public interface UserService {
 
-    User register(User user);
-
-    User update(User user);
-
-    Page<User> getAll(int page, int size);
-
-    Page<User> getAllByStatusNot(Pageable pageable, Status status);
-
-    long countUsersByBetweenDate(Date start, Date end);
-
-    long countEntities();
-
-    User findByEmail(String email);
-
     User findById(Long id);
 
-    User findByIdAndStatusNot(long id, Status status);
+    User findByIdWithTaskList(Long id);
 
-    Page<User> getAllByStatusNotAndFirstNameContainingOrLastNameContaining(Pageable pageable,
-                                                                           Status status,
-                                                                           String searchFirstName,
-                                                                           String searchLastName);
+    boolean updateAboutMe(Long id, String aboutMe);
 
-    void delete(Long id);
+    void updateAvatar(Long id, String avatar);
+
+    Page<User> findAll(Pageable pageable);
+
+    boolean delete(Long id);
+
+    Page<User> findAllActive(boolean isActive, Pageable pageable);
+
+    Page<User> findAllActiveAndNameContaining(boolean isActive, String search, Pageable pageable);
+
+    void update(Long id, String firstName, String lastName, String email, boolean isActive, List<RoleDto> roles, String aboutMe);
+
+    long countActiveUsers();
+
+    long countNewUsers(int days);
+
+    User create(String email, String password, String firstName, String lastName);
 }

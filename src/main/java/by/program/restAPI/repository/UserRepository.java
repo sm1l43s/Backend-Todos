@@ -1,27 +1,78 @@
 package by.program.restAPI.repository;
 
-import by.program.restAPI.model.Status;
 import by.program.restAPI.model.User;
 import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Optional;
+
+import static by.program.restAPI.config.SecurityConfig.PASSWORD_ENCODER;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findByEmail(String email);
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.tasks WHERE u.id = :id")
+    Optional<User> findByIdWithTaskList(@Param("id") Long id);
 
-    Optional<User> findByIdAndStatusNot(long id, Status status);
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.isActive = :isActive WHERE u.id = :id")
+    int updateIsActiveById(@Param("id") Long id, @Param("isActive") Boolean isActive);
 
-    Page<User> findAllByStatusNot(Pageable pageable, Status status);
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.aboutMe = :aboutMe WHERE u.id = :id")
+    int updateAboutMeById(@Param("id") Long id, @Param("aboutMe") String aboutMe);
 
-    Page<User> findAllByStatusNotAndFirstNameContainingOrLastNameContaining(Pageable pageable,
-                                                                            Status status,
-                                                                            String searchFirstName,
-                                                                            String searchLastName);
+    @Modifying
+    @Query("UPDATE User u SET u.avatar = :avatar WHERE u.id = :id")
+    int updateAvatarById(@Param("id") Long id, @Param("avatar") String avatar);
 
-    long countByCreatedLessThanAndCreatedGreaterThan(Date startDate, Date endDate);
+    @Query(value = "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.tasks",
+            countQuery = "SELECT COUNT(u) FROM User u")
+    Page<User> findAllWithTaskList(Pageable pageable); // заменить на следующий метод с проверкой статуса
+
+    @Query(
+            value = "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.tasks WHERE u.isActive = :active",
+            countQuery = "SELECT COUNT(u) FROM User u WHERE u.isActive = :active"
+    )
+    Page<User> findAllActiveUsersWithTaskList(@Param("active") boolean active, Pageable pageable);
+
+    @Query(
+            value = """
+                    SELECT DISTINCT u FROM User u
+                    LEFT JOIN FETCH u.tasks
+                    WHERE u.isActive <> :active AND 
+                          (LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) 
+                          OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))
+                    """,
+            countQuery = """
+                    SELECT COUNT(u) FROM User u
+                    WHERE u.isActive <> :active AND 
+                          (LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) 
+                          OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))
+                    """
+    )
+    Page<User> findAllActiveAndNameContainingWithTaskList(
+            @Param("active") boolean active,
+            @Param("search") String search,
+            Pageable pageable
+    );
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.isActive = true")
+    long countActiveUsers();
+
+    long countByCreatedBetween(LocalDate startDate, LocalDate endDate);
+
+    Optional<User> findByEmail(String email);
+
+    default User prepareAndSaveWithPassword(User user) {
+        user.setPassword(PASSWORD_ENCODER.encode(user.getPassword()));
+        return save(user);
+    }
 }

@@ -1,138 +1,162 @@
 package by.program.restAPI.service.impl;
 
+import by.program.restAPI.dto.roleDto.RoleDto;
+import by.program.restAPI.exception.NotFoundException;
 import by.program.restAPI.model.Role;
-import by.program.restAPI.model.Status;
 import by.program.restAPI.model.User;
 import by.program.restAPI.repository.RoleRepository;
 import by.program.restAPI.repository.UserRepository;
 import by.program.restAPI.service.UserService;
+import by.program.restAPI.utils.RoleUtil;
+import by.program.restAPI.utils.ValidationUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Transactional
 @Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
-    public User register(User user) {
+    @Transactional
+    public User create(String email, String password, String firstName, String lastName) {
+        log.debug("Create new user");
+
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
         userRoles.add(roleUser);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(userRoles);
-        user.setStatus(Status.ACTIVE);
-        user.setCreated(Date.valueOf(LocalDate.now()));
-        user.setUpdated(Date.valueOf(LocalDate.now()));
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setPassword(password);
+        newUser.setRoles(userRoles);
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
+        newUser.setActive(true);
 
-        User registeredUser = userRepository.save(user);
+        ValidationUtil.validate(newUser);
+        newUser = userRepository.prepareAndSaveWithPassword(newUser);
 
-        log.info("IN register - user: {} successfully registered", registeredUser.getEmail());
+        log.info("New user with id {} and email {} successfully created", newUser.getId(), email);
 
-        return registeredUser;
+        return newUser;
     }
 
     @Override
-    public User update(User user) {
-        user.setUpdated(Date.valueOf(LocalDate.now()));
-        log.info("IN update - data user {} succesfully updated", user.getEmail());
-        User updateUser = userRepository.save(user);
-        return updateUser;
+    public User findByIdWithTaskList(Long id) {
+        log.debug("Find user with id = {} with task list", id);
+        return userRepository
+                .findByIdWithTaskList(id)
+                .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }
-
-    @Override
-    public Page<User> getAll(int page, int size) {
-        Page<User> result = userRepository.findAll(PageRequest.of(page, size));
-        log.info("IN getAll - {} users found with page - {} and size - {}", result.getContent().size(), page, size);
-        return result;
-    }
-
-    @Override
-    public Page<User> getAllByStatusNot(Pageable pageable, Status status) {
-        Page<User> result = userRepository.findAllByStatusNot(pageable, status);
-        log.info("IN getAllByStatusNot - {} user found with pageable - {}, where status not - {}", result, pageable, status);
-        return result;
-    }
-
-    @Override
-    public long countUsersByBetweenDate(Date start, Date end) {
-        long count = userRepository.countByCreatedLessThanAndCreatedGreaterThan(start, end);
-        log.info("IN countUsersByBetweenDate - count users: {} by between date: {} - {}", count, start, end);
-        return count;
-    }
-
-    @Override
-    public long countEntities() {
-        long count = userRepository.count();
-        log.info("IN countEntities - count all users: {}", count);
-        return count;
-    }
-
-    @Override
-    public Page<User> getAllByStatusNotAndFirstNameContainingOrLastNameContaining(Pageable pageable, Status status,
-                                                                                  String searchFirstName,
-                                                                                  String searchLastName) {
-        Page<User> result = userRepository.findAllByStatusNotAndFirstNameContainingOrLastNameContaining(pageable, status,
-                searchFirstName, searchFirstName);
-        log.info("IN getAllByStatusNotAndFirstNameContainingAndLastNameContaining - {} user found", result);
-        return result;
-    }
-
-    @Override
-    public User findByEmail(String email) {
-        User result = userRepository.findByEmail(email);
-
-        if (result == null) {
-            log.warn("IN findByEmail - no user found by email: {}", email);
-            return null;
-        }
-
-        log.info("IN findByEmail - user: {} found by email: {}", result.getEmail(), email);
-        return result;
-    }
-
 
     @Override
     public User findById(Long id) {
-        User result = userRepository.findById(id).orElse(null);
-
-        log.info("IN findById - user: {} found by id: {}", result.getEmail());
-        return result;
+        log.debug("Find user with id = {}", id);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id = " + id + " not found"));
     }
 
     @Override
-    public User findByIdAndStatusNot(long id, Status status) {
-        User result = userRepository.findByIdAndStatusNot(id, status).orElse(null);
-        log.info("IN findByIdAndStatusNot - user: {} found by id: {} and status not: {}", result.getEmail(), id, status);
-        return result;
+    @Transactional
+    public boolean delete(Long id) {
+        log.debug("Attempting to delete user with id = {}", id);
+        int updatedEntities = userRepository.updateIsActiveById(id, false);
+
+        if (updatedEntities > 0) {
+            log.info("User with id: {} successfully deleted", id);
+            return false;
+        } else {
+            throw new NotFoundException("Not found entity with id= " + id);
+        }
     }
 
     @Override
-    public void delete(Long id) {
-        userRepository.deleteById(id);
-        log.info("IN delete - user with id: {} successfully deleted");
+    @Transactional
+    public boolean updateAboutMe(Long id, String aboutMe) {
+        log.debug("Update information about user with id {}", id);
+        int updatedEntities = userRepository.updateAboutMeById(id, aboutMe);
+
+        if (updatedEntities > 0) {
+            log.debug("Information successfully updated for user with id {}", id);
+            return true;
+        } else {
+            throw new NotFoundException("Not found entity with id= {}" + id);
+        }
+    }
+
+    @Transactional
+    public void updateAvatar(Long id, String avatarUri) {
+        log.debug("Update avatar for user with id {}", id);
+        int updatedEntities = userRepository.updateAvatarById(id, avatarUri);
+
+        if (updatedEntities > 0) {
+            log.debug("Avatar successfully updated for user with id {}", id);
+        } else {
+            throw new NotFoundException("Not found entity with id= {}" + id);
+        }
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        log.debug("Get all users by pageable");
+        return userRepository.findAllWithTaskList(pageable);
+    }
+
+    @Override
+    public Page<User> findAllActive(boolean isActive, Pageable pageable) {
+        log.info("Get all users, where status - active");
+        return userRepository.findAllActiveUsersWithTaskList(isActive, pageable);
+    }
+
+    public Page<User> findAllActiveAndNameContaining(boolean isActive, String search, Pageable pageable) {
+        log.info("Get all active users, where searching line - {}", search);
+        return userRepository.findAllActiveAndNameContainingWithTaskList(
+                isActive, search, pageable);
+    }
+
+    @Override
+    @Transactional
+    public void update(Long id, String firstName, String lastName, String email, boolean isActive, List<RoleDto> roleDtoList, String aboutMe) {
+        log.debug("Update user with id= {}", id);
+        User user = findById(id);
+        List<Role> roles = RoleUtil.getRoles(roleDtoList);
+
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setActive(isActive);
+        user.getRoles().clear();
+        user.getRoles().addAll(roles);
+        user.setAboutMe(aboutMe);
+
+        userRepository.save(user);
+        log.debug("User {} successfully updated", id);
+    }
+
+    @Override
+    public long countActiveUsers() {
+        log.debug("Count active users");
+        return userRepository.countActiveUsers();
+    }
+
+    @Override
+    public long countNewUsers(int days) {
+        log.debug("Count new users for {} days", days);
+        LocalDate now = LocalDate.now();
+        LocalDate fromDate = now.minusDays(days);
+
+        return userRepository.countByCreatedBetween(fromDate, now);
     }
 }
